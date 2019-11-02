@@ -73,7 +73,7 @@ def tasks():
         ]
     
     return render_template(
-        'task.html',
+        'tasks.html',
         form=AddTaskForm(request.form),
         open_tasks=open_tasks,
         closed_tasks=closed_tasks
