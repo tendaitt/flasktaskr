@@ -76,3 +76,44 @@ def tasks():
         open_tasks=open_tasks,
         closed_tasks=closed_tasks
     )
+
+# Add new tasks
+@app.route('/add/', methods=['POST'])
+@login_required
+def new_task():
+    with connect_db() as g.db:
+        name = request.form['name']
+        date = request.form['due_date']
+        priority = request.form['priority']
+
+        if not name or not date or not priority:
+            flash("All fields are required. Please try again.")
+            return redirect(url_for('tasks'))
+        else:
+            g.db.execute('INSERT INTO tasks (name, due_date, priority, status) \
+                values (?, ?, ?, 1)', [name, date, priority])
+            g.db.commit()
+            flash('New entry was successfully posted. Thanks.')
+            return redirect(url_for('tasks'))
+
+# Mark tasks as complete
+@app.route('/complete/<int:task_id>/')
+@login_required
+def complete(task_id):
+    with connect_db() as g.db:
+        g.db.execute(
+            'UPDATE tasks SET status = 0 WHERE task_id='+str(task_id)
+        )
+        g.db.commit()
+        flash('The task was marked as complete.')
+        return redirect(url_for('tasks'))
+
+# Delete tasks
+@app.route('/delete/<int:task_id>/')
+@login_required
+def delete_entry(task_id):
+    with connect_db() as g.db:
+        g.db.execute('DELETE FROM tasks WHERE task_id='+str(task_id))
+        g.db.commit()
+        flash('The task was deleted.')
+        return redirect(url_for('tasks'))
