@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from forms import AddTaskForm, RegisterForm, LoginForm
 
+import datetime
+
 # config
 
 app = Flask(__name__)
@@ -79,6 +81,8 @@ def new_task():
                 form.name.data,
                 form.due_date.data,
                 form.priority.data,
+                datetime.datetime.utcnow(),
+                '1',
                 '1'
             )
             db.session.add(new_task)
