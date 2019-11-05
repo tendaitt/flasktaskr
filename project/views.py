@@ -130,3 +130,9 @@ def register():
             return redirect(url_for('login'))
     
     return render_template('register.html', form=form, error=error)
+
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the %s field - %s" % (
+                getattr(form, field).label.text, error), 'error')
