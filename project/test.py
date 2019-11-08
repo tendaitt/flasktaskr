@@ -39,7 +39,7 @@ class AllTests(unittest.TestCase):
     def test_form_is_present(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Please login to access your task list.', response.data)
+        self.assertIn(b'Please sign in to access your task list', response.data)
     
     def login(self, name, password):
         return self.app.post('/', data=dict(
