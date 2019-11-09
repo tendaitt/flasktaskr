@@ -108,18 +108,39 @@ class UsersTests(unittest.TestCase):
         response = self.logout()
         self.assertNotIn(b'Goodbye!', response.data)
     
-    def test_logged_in_users_can_access_tasks_page(self):
-        self.register(
-            'Fletcher', 'fletcher@realpython.com', 'python101', 'python101'
+    def test_duplicate_user_registration_throws_error(self):
+        self.register('Fletcher', 'fletcher@realython.com', 'python101', 'python101')
+        response = self.register('Fletcher', 'fletcher@realpython.com', 'python101', 'python101')
+        self.assertIn(
+            b'That username and/or email already exist.',
+            response.data
         )
-        self.login('Fletcher', 'python101')
-        response = self.app.get('tasks/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Add a new task:', response.data)
     
-    def test_not_logged_in_users_cannot_access_tasks_page(self):
-        response = self.app.get('tasks/', follow_redirects=True)
-        self.assertIn(b'You need to login first.', response.data)
+    def test_user_login_field_errors(self):
+        response = self.app.post(
+            '/',
+            data=dict(
+                name='',
+                password='python101'
+            ),
+            follow_redirects=True
+        )
+        self.assertIn(b'This field is required.', response.data)
+    
+    def test_string_representation_of_the_user_object(self):
+        db.session.add(
+            User(
+                "Johnny",
+                "john@doe.com",
+                "johnny"
+            )
+        )
+
+        db.session.commit()
+
+        users = db.session.query(User).all()
+        for user in users:
+            self.assertEqual(user.name, 'Johnny')
 
 if __name__ == "__main__":
     unittest.main()
