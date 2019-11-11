@@ -3,7 +3,7 @@ import unittest
 
 from project import app, db
 from project._config import basedir
-from project.models import User
+from project.models import Task, User
 
 TEST_DB = 'test.db'
 
@@ -179,6 +179,26 @@ class TaskTests(unittest.TestCase):
         self.assertNotIn(
             b'You can only delete tasks that belong to you.', response.data
         )
+    
+    def test_string_representation_of_the_task_object(self):
+
+        from datetime import date
+        db.session.add(
+            Task(
+                "Run around in circles",
+                date(2015, 1, 22),
+                10,
+                date(2015, 1, 23),
+                1,
+                1
+            )
+        )
+
+        db.session.commit()
+
+        tasks = db.session.query(Task).all()
+        for task in tasks:
+            self.assertEqual(task.name, 'Run around in circles')
     
 if __name__ == "__main__":
     unittest.main()
